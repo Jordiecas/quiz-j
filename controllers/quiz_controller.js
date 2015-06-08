@@ -30,7 +30,23 @@ exports.author=function(req, res){
 
 // GET /quizes
 exports.index=function(req, res){
-	models.Quiz.findAll().then(function(quizes){
+	if(typeof(req.query.search) !== "undefined"){	//Ya definido en index.ejs. Estamos buscando
+		var search='%'+req.query.search+'%';		//Añadimos % inicial y final
+		search=search.replace(/ /g, '%');	//Suprimimos blancos
+		models.Quiz.findAll({where: ["pregunta like ?", search], order:'pregunta ASC'}).then(function(quizes){
+		/*quizes.sort(function(a,b){	//Ordenamos quizes
+			var nameA=a.pregunta.toLowerCase(), nameB=b.pregunta.toLowerCase();
+ 			if (nameA < nameB) //sort string ascending
+ 				return(-1);
+ 			if (nameA > nameB) return(1);
+ 			return(0); //default return value (no sorting)
+		});*/
 		res.render('quizes/index',{quizes: quizes});
-	}).catch(function(error){next(error);})
+		}).catch(function(error){next(error);})
+	}
+	else{	//Primera entrada a preguntas
+		models.Quiz.findAll().then(function(quizes){
+		res.render('quizes/index',{quizes: quizes});
+		}).catch(function(error){next(error);})
+	}
 };
