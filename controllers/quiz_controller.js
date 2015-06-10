@@ -1,5 +1,6 @@
 var models=require('../models/models.js');
 
+
 // Autoload - factoriza el código si ruta incluye :quizId
 exports.load=function(req, res, next, quizId){
 	models.Quiz.find(quizId).then(
@@ -47,8 +48,9 @@ exports.index=function(req, res){
 // GET /quizes/new
 exports.new=function(req, res){
 	var quiz=models.Quiz.build( // crea objeto quiz
+
 	{
-		pregunta: "Pregunta", respuesta: "Respuesta"
+		pregunta: "Pregunta", respuesta: "Respuesta", tema: "Tema"
 	});
 	res.render('quizes/new', {quiz: quiz, errors: []});
 };
@@ -56,15 +58,15 @@ exports.new=function(req, res){
 // POST /quizes/create
 exports.create=function(req, res){
 	var quiz=models.Quiz.build(req.body.quiz);
-	
+	quiz.tema=req.body.tema;	
 	var errors=quiz.validate();
 
 	if (errors) {
 		var i=0; var errores=new Array();//se convierte en [] con la propiedad message por compatibilida con layout
 		for (var prop in errors) errores[i++]={message: errors[prop]};
 		res.render('quizes/new', {quiz: quiz, errors: errores});
-	} else {// guarda en DB los campos pregunta y respuesta de quiz
-		quiz.save({fields: ["pregunta", "respuesta"]}).then(function(){
+	} else {// guarda en DB los campos pregunta, respuesta y tema de quiz
+		quiz.save({fields: ["pregunta", "respuesta", "tema"]}).then(function(){
 		res.redirect('/quizes')});	// Redirección HTTP (URL relativo) lista de preguntas
 	}
 };
@@ -80,6 +82,7 @@ exports.edit=function(req, res){
 exports.update=function(req, res){
 	req.quiz.pregunta=req.body.quiz.pregunta;
 	req.quiz.respuesta=req.body.quiz.respuesta;
+	req.quiz.tema=req.body.tema;
 
 	var errors=req.quiz.validate();
 	
@@ -88,8 +91,8 @@ exports.update=function(req, res){
 		for (var prop in errors) errores[i++]={message: errors[prop]};
 		res.render('quizes/edit', {quiz: req.quiz, errors: errores});
 	} else {
-				req.quiz 	// save: guarda campos pregunta y respuesta en DB
-				.save({fields: ["pregunta", "respuesta"]})
+				req.quiz 	// save: guarda campos pregunta, respuesta y tema en DB
+				.save({fields: ["pregunta", "respuesta", "tema"]})
 				.then(function(){res.redirect('/quizes');});
 				// Redirección HTTP a Lista de preguntas (URL relativo)
 	}
