@@ -30,6 +30,22 @@ app.use(session());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
+// middleware de autologout modificado
+app.use(function(req, res, next) {
+    if(req.session.user){// si estamos en una sesion
+        if(!req.session.user.marcatiempo){//primera vez se pone la marca de tiempo
+            req.session.user.marcatiempo=(new Date()).getTime();
+         }else{
+            if((new Date()).getTime()-req.session.user.marcatiempo > 120000){//se pasó el tiempo y eliminamos la sesión (2min=120000ms)
+                delete req.session.user;     //eliminamos el usuario
+            }else{//hay actividad se pone nueva marca de tiempo
+                req.session.user.marcatiempo=(new Date()).getTime();
+            }
+        }
+    }
+    next();
+});
+
 // Helpers dinámicos
 app.use(function(req, res, next){
     // guardar path en session.redir para después de login
