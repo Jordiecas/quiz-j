@@ -1,0 +1,22 @@
+<h3>Estadísticas</h3>
+<%for(i=0, comentarios=0, con_comentarios1=0; i<quizes.length; i++)
+	if("comments" in quizes[i]){
+		for(j=0, con_comentarios2=0;j<quizes[i].comments.length;j++)
+			if(quizes[i].comments[j].publicado){
+				comentarios++;
+				con_comentarios2=1;
+			}
+		con_comentarios1+=con_comentarios2;
+	}
+%>
+			
+
+<div class='centraTabla'>
+	<table>
+		<tr><td>Número total de preguntas</td><td><%= quizes.length %></td></tr>
+		<tr><td>Número total de comentarios</td><td><%= comentarios %></td></tr>
+		<tr><td>Número medio de comentarios por pregunta</td><td><%= comentarios/quizes.length %></td></tr>
+		<tr><td>Número de preguntas sin comentarios</td><td><%= quizes.length-con_comentarios1 %></td></tr>
+		<tr><td>Número de preguntas con comentarios</td><td><%= con_comentarios1 %></td></tr>
+	</table>
+</div>
